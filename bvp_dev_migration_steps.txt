@@ -1,0 +1,69 @@
+Development:
+
+Steps for Migration:
+1) Export the Prod website file from WordPress
+2) Setting up Development Env(Installation)
+3) Import the Prod website file in the Development Server WordPress
+4) Check the Website working fine or not in the Development(Email Checks etc)
+5) Migrate the Prod Wordpress DB to the Development env
+6) Do the required configurations in the dev env if needed
+7) Setting up Mail Server and Configuration
+8) Create a Staging Server and Setting up Staging Env.
+9) Import the website file in the Staging server created in AWS(Client AWS)
+10) Migrate the Wordpress DB to Staging env
+11) Setting up Mail Server and Configuration
+12) Migrate the SQlite DB to Mysql Db in staging
+13) Get a domain in AWS as bvp-staging
+14) Create and link the staging server with the Domain(bvp-staging.com) 
+15) Check the Website working fine or not in the Staging (Email Checks etc)
+16) Do the required configurations in the staging env if needed
+17) Create a Prod Server and setting up Prod env in AWS.
+18) Migrate the Staging to Production.
+19) Migrate the SQlite DB to Mysql Db in Prod
+20) Observe and do the Sanity/QA Testing on the production
+21) Migrate the Domain from Godaddy to AWS
+23) Observe and do the Sanity/QA Testing on the production
+
+***************************************************
+
+Installation:
+Ubuntu:
+sudo apt-get update
+sudo apt-get install apache2
+sudo apt-get install mysql-server
+	- if no password asked:
+		sudo mysqld_safe --skip-grant-tables&
+		sudo mysql --user=root mysql
+		mysql> update user set authentication_string=PASSWORD('new-password') where user='root';
+		flush privileges;
+		quit
+		sudo service mysql restart
+		sudo mysql -u root -p
+		exit
+sudo apt-get install php libapache2-mod-php php-mcrypt php-mysql
+sudo service apache2 reload
+sudo vim /var/www/html/info.php
+	<?php
+	phpinfo();
+sudo apt-get install postfix -y
+	- select internet site
+	- enter domain name - deep.com
+sudo vim /etc/postfix/main.cf
+	inet_interfaces = localhost
+	mydestination =
+sudo mysql -u root -p
+	CREATE DATABASE wpdemo;
+sudo rm -Rf /var/www/html/*
+sudo wget -qO- https://wordpress.org/latest.tar.gz | sudo tar xvz -C /var/www/html --strip-components=1
+sudo chown -R www-data:www-data /var/www/html
+sudo apt-get install php-xml
+sudo nano /etc/apache2/apache2.conf
+	<Directory /var/www/>
+		Options Indexes FollowSymLinks MultiViews
+		AllowOverride All
+		Order allow,deny
+		allow from all
+	</Directory>
+sudo a2enmod rewrite
+sudo service apache2 restart	
+sudo apt-get install php7.0-gd

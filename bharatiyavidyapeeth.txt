@@ -1,0 +1,134 @@
+Server Details:
+
+Hello Dhiraj Sir
+
+For registration link and db access:
+
+Login Link: https://www.pythonanywhere.com/login/ 
+
+Username: BharatiVidyapeeth
+Password: BharatiVidyapeeth 
+
+Path for the latest code is '/home/BharatiVidyapeeth/bv_portal_3_3_2020'.
+The database is in SQLite and the file name of the database is  ‘db.sqlite3’
+
+For Wordpress access:
+http://www.bharatividyapeethsoe.com/wp-admin
+Username:   jit@1231
+Password:    Jaro@1231
+
+Username   jit1231
+Password   Jaro@1231 
+
+
+Web Hosting Login:
+For FTP Access: 
+http://www.bharatividyapeethsoe.com/
+
+https://132.148.241.153:8443
+
+User Name:  admin
+Password: Pass@987
+
+
+
+For AWS Access:
+bills@jaro.in
+Super*@100
+
+
+
+Incase, you require any DNS changes to be done on Godaddy, let us know. @Vikas Sir, would be able make necessary changes.
+
+
+**********************************************************************************************************************************
+
+Website with static data
+Online learning
+1. At a high level change the UI tii ok make it user friendly and look like a professional site 
+2. It has bootstrap so we need to ensure it works fine on most popular mobiles in India
+3. An angular UI calling the Django API would make it crisp
+4. Look for improvements and list them to be prioritized by business 
+5. Any missing functionality to be called out too
+6. Estimate the efforts and create a fixed price proposal. 
+I will share a confirmation on scope .
+Do share any aspect I may have missed
+
+Home
+About Us
+	Overview
+	Founder Bharati Vidyapeeth
+	About Bharati Vidyapeeth
+	About Bharati Vidyapeeth(deemed to be university)
+	Advisory Council
+Message From
+	Hon'ble Chancellor
+	Hon'ble Vice Chancellor
+	Hon'ble Pro-voice Chancellor
+	Director SOE
+Program:
+	BBA preface and Structure
+	BBA(Online) Syllabus
+	MBA preface and Structure
+	MBA(Online) Syllabus
+Admission:
+	Overview
+	Admission Procedure
+	Student Manual For Online Admission
+	Apply Now
+Student Support
+	Payment and Refund Of Fees
+	E-Learning Swayam
+Recognition
+	UGC Public notice
+	UGC Letter Of Categorization
+	NAAC Accreditation Certificate
+	NIRF 2019
+	NIRF 2018
+	NIRF 2017
+CIQA Committee
+Contact
+	Head Office
+Helplines
+Student World
+
+****************************************************
+Functional Requirements
+1.       Public Facing Website
+2.       Student Dashboard – B Lounge
+3.       Content Management System
+	a.       Videos
+	b.      Concept Notes
+	c.       Quizzes
+	d.      Question Bank
+	e.      Assignments
+4.       Admin Portal to manage
+	a.       Fees – Fee History, Invoices, Track Fee payment
+	b.      Admission management
+	c.       Student Documents
+	d.      Feedback/Announcements
+5.       Exam Management – Creation/Scheduling/Proctored environment
+6.       Evaluation
+7.       Report Generation
+	a.       Student reports
+	b.      Admin reports (if needed)
+8.       Live Conferencing
+
+************************************************************
+
+Scope 1:
+
+1) Migrating the already created website from Godaddy to AWS
+2) Reducing the website loading time
+
+*************************************************************
+
+Git:
+
+git clone https://github.com/Dhiraj2904/BVP-WebApp.git
+
+git init
+git add README.md
+git commit -m "first commit"
+git remote add origin https://github.com/Dhiraj2904/BVP-WebApp.git
+git push -u origin master

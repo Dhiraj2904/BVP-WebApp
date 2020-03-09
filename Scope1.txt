@@ -1,0 +1,256 @@
+Scope 1:
+
+for achievig this we will need below accesses:
+1) Godaddy server admin access
+2) AWS server access
+3) Files and Folder locations of the website in godaddy server
+4) DB related files and folder details and the DB used(mongodb,mysql.Postgres etc)
+
+---------
+Quote:
+
+
+------------
+VIP:
+https://www.onepagezen.com/migrate-wordpress-aws/
+************
+https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/migrate-dns-domain-in-use.html#migrate-dns-change-name-servers-with-provider-procedure
+1) Migrating the already created website from Godaddy to AWS
+	- Migrate DNS from Godaddy to AWS(https://lobster1234.github.io/2017/05/10/migrating-a-domain-to-amazon-route53/)
+		- DNS Speed Check for Websites(https://dnscheck.pingdom.com/)
+	- How to move a domain from Godaddy to AWS Route 53
+		-Solution:
+			Login on your aws console; Click on Route 53; Create Hosted Zone; Select your new created host title and click "Go to Record Sets", take note of the nameservers;
+
+			Login on your Godaddy account; Select your domain; Go to Nameservers and click SetNameservers; paste all the four you took from "Go to Record Sets" Route 53;
+	- To transfer your hosting, you have to do it manually:
+		1) Set up the EC2 instance with the same environment that is on GoDaddy
+		2) If you have databases in Godaddy, you need to install the same database type on an RDS instance
+		and make sure that your VPC is properly setup to allow the EC2 instance to securely talk to the RDS instance.
+		3) Make sure that you have an elastic IP mapped to your EC2 so that you can access your webpage from internet
+		3) Export your website files and databases (if any)
+		4) Import the website files to EC2 using an FTP client
+		5) Import your database tables using a client like MySQL workbench
+		6) Test your website from a browser (using the elastic IP)
+		7) Use Route 53 to transfer your domain and map it to the elastic IP in the DNS settings
+		8) Test your website from a browser (using your domain)		
+	- Sqlite migration to MySQL (https://justinmi.me/blog/2017/04/28/migrating-sql-databases)
+		1) Step 1 (Ubuntu): Downloading and Setting Up MySQL
+			- $ sudo apt-get update
+			- $ sudo apt-get install mysql-server
+			- sudo mysql_secure_installation
+			- systemctl status mysql.service
+			- sudo systemctl mysql start
+		2) Step 2: Finshing Up Installation
+			- Try running mysql in terminal. You might get an error like “command not found”. If so, in terminal, configure your computer’s $PATH so it recognizes mysql as an exectutable:
+				export PATH=$PATH:/path/to/your/mysql/bin - Syntax
+				export PATH=$PATH:/usr/local/mysql/bin
+				vim ~/.bash_profile
+					# Set architecture flags
+					export ARCHFLAGS="-arch x86_64"
+					# Ensure user-installed binaries take precedence  
+					export PATH=/usr/local/mysql/bin:$PATH  
+					# Load .bashrc if it exists  
+					test -f ~/.bashrc && source ~/.bashrc
+		3) Step 3: Creating MySQL Users
+			- mysql -u root -p
+			- ALTER USER 'root'@'localhost' IDENTIFIED BY 'your_new_password';      ---to change the root password
+			- Create your own user:
+				mysql> CREATE USER 'your_new_username'@'localhost' IDENTIFIED BY 'new_password';
+				mysql> GRANT ALL PRIVILEGES ON * . * TO 'your_new_username'@'localhost';
+				mysql> FLUSH PRIVILEGES;
+		4) Step 4: Creating the Project Database	
+			mysql> CREATE DATABASE your_project_name CHARACTER SET UTF8;
+			mysql> GRANT ALL PRIVILEGES ON your_project_name.* TO your_username@localhost;
+			mysql> FLUSH PRIVILEGES;
+			mysql> QUIT
+		5) Step 5: Changing Django App Settings
+			-Now, in your terminal, navigate to the root directory of your Django application
+				-$ python manage.py dumpdata --natural-foreign --natural-primary -e contenttypes -e auth.Permission --indent 4 > datadump.json
+			- pip install mysql-connector-python
+			- Finally, in your settings.py file in your app, change the DATABASES section to the following:
+				DATABASES = {
+					'default': {
+						'ENGINE': 'django.db.backends.mysql',
+						'NAME': 'your database name',
+						'USER': 'root',
+						'PASSWORD': 'your_root_password',
+						'HOST': 'your_host_address', 
+						'PORT': 'your_port',
+					}
+				}
+		6) Step 6: Make Migrations
+			- If your migration fails, you may need to do some debugging. Every case may be different, so I cannot give much advice here, unfortunately. However, if you want to retry a migration after making some changes, you will need to start with an empty database. To do that, we will DROP the database and create a new one. To do so:
+				mysql> DROP DATABASE pcari;
+				mysql> CREATE DATABASE pcari CHARACTER SET UTF8;
+				mysql> GRANT ALL PRIVILEGES ON pcari.* TO root@localhost;
+				mysql> FLUSH PRIVILEGES;
+				mysql> QUIT
+			- We are in the home stretch! Now, all we need to do is apply any migrations you made to the new MySQL database. The details are all abstracted away for you, so all you need to do is run:
+				- $ python manage.py makemigrations
+				- $ python manage.py migrate --run-syncdb
+			- Finally, when your MySQL database is all set up, load all the data you saved in the dumpfile in step 3:
+				- python manage.py loaddata datadump.json
+	
+********************************************************************
+Migrate Wordpress to AWS
+
+install Wordpress
+Transfer DNS to AWS
+Transfer Domain to AWS
+Transfer Hosting to AWS
+Migrate Database
+
+*******************
+PHP.ini file is in below path for increasing the max upload file
+/opt/bitnami/php/etc/php.ini
+/etc/php/7.0/apache2/php.ini
+sudo /opt/bitnami/ctlscript.sh restart php-fpm
+
+memory_limit - 401
+post_max_size - 689
+upload_max_filesize - 841
+
+****************************************
+
+Creating a Dev Env- https://graspingtech.com/wordpress-development-ubuntu-desktop/
+
+Ubuntu:
+sudo apt-get update
+sudo apt-get install apache2
+sudo apt-get install mysql-server
+	- if no password asked:
+		sudo mysqld_safe --skip-grant-tables&
+		sudo mysql --user=root mysql
+		mysql> update user set authentication_string=PASSWORD('new-password') where user='root';
+		flush privileges;
+		quit
+		sudo service mysql restart
+		sudo mysql -u root -p
+		exit
+sudo apt-get install php libapache2-mod-php php-mcrypt php-mysql
+sudo service apache2 reload
+sudo vim /var/www/html/info.php
+	<?php
+	phpinfo();
+sudo apt-get install postfix -y
+	- select internet site
+	- enter domain name - deep.com
+sudo vim /etc/postfix/main.cf
+	inet_interfaces = localhost
+	mydestination =
+sudo mysql -u root -p
+	CREATE DATABASE wpdemo;
+sudo rm -Rf /var/www/html/*
+sudo wget -qO- https://wordpress.org/latest.tar.gz | sudo tar xvz -C /var/www/html --strip-components=1
+sudo chown -R www-data:www-data /var/www/html
+
+Webmin:
+
+sudo apt update
+sudo apt install software-properties-common apt-transport-https wget
+wget -q http://www.webmin.com/jcameron-key.asc -O- | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] http://download.webmin.com/download/repository sarge contrib"
+sudo apt update
+sudo apt install webmin
+sudo /usr/share/webmin/changepass.pl /etc/webmin root NEWPASSWORD
+	pass=webmin
+wget https://software.virtualmin.com/gpl/scripts/install.sh
+sudo /bin/sh ./install.sh
+	
+
+CentOS:
+sudo yum update
+sudo yum install perl
+sudo yum install nano
+sudo nano /etc/sysconfig/network
+	HOSTNAME=ip-172-31-19-88.sysadmin.info
+sudo reboot
+sudo curl -o latest -L https://securedownloads.cpanel.net/latest
+cd latest
+sudo sh latest
+https://ipaddress:2087
+sudo passwd root	
+	
+	
+******************************************************************
+Migration to AWS being step 1
+
+Quote:
+1
+4
+4
+1
++5
+
+1) Buy a domain names bvpsoe_staging in AWS
+2) Create a Staging server
+3) Moving the Production Godaddy Website and DB to Staging and Development in AWS
+4) Monitoring the Staging environment for few days to test if migration was fully done or not
+5) Making Changes in Staging if something is missed/pending
+6) Creating a Production Server
+7) Migrating the Prod Godaddy Website and DB to AWS Production
+8) Monitoring the AWS Production environment for few days:
+	 If Success: All OK
+	 IF Fail : Rollback the changes in Godaddy
+9) Reducing the load time of Website	
+	
+Benefits:
+Staging and Dev Env created
+Website migrated to all environments
+Website loadtime reduced
+Scalable DB
+Support LMS
+
+
+Hosting Migration
+Domain Migration
+Database Migration from SQLite to Mysql
+QA Testing
+UAT
+Dataloading from godaddy to AWS
+Mail Migration
+
+
+****************************************************************************************
+
+Steps:
+Step 1: Back up your website files
+Step 2: Export The WordPress Database
+Step 3: Create The WordPress Database On Your New Host Server	
+
+SQLITE to Mysql DB
+python manage.py dumpdata > db.json
+Change the database settings to new database such as of MySQL / PostgreSQL.
+python manage.py migrate
+python manage.py shell 
+Enter the following in the shell
+from django.contrib.contenttypes.models import ContentType
+ContentType.objects.all().delete()
+python manage.py loaddata db.json
+*********************************************
+
+Steps for Migration:
+1) Export the Prod website file from WordPress
+2) Import the Prod website file in the Development Server WordPress
+3) Check the Website working fine or not in the Development(Email Checks etc)
+4) Migrate the Prod Wordpress DB to the Development env
+4) Do the required configurations in the dev env if needed
+5) Create a Staging Server and install all softwares like LAMP,Wordpress etc. in staging server.
+6) Import the website file in the Staging server created in AWS(Client AWS)
+7) Migrate the Wordpress DB to Staging env
+8) Migrate the SQlite DB to Mysql Db in staging
+9) Get a domain in AWS as bvp-staging
+10) Create and link the staging server with the Domain(bvp-staging.com) 
+11) Check the Website working fine or not in the Staging (Email Checks etc)
+12) Do the required configurations in the staging env if needed
+13) Create a Prod Server and install all the required LAMP,Wordpress etc. or cpoy te same env in AWS.
+14) Migrate the Staging to Production.
+15) Migrate the SQlite DB to Mysql Db in Prod
+16) Observe and do the Sanity/QA Testing on the production
+17) Migrate the Domain from Godaddy to AWS
+18) Observe and do the Sanity/QA Testing on the production
+17) 
+
+	
+	
